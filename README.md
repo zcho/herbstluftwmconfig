@@ -1,27 +1,30 @@
 # mylinux — herbstluftwm setup
 
-Готовая конфигурация оконного менеджера [herbstluftwm](https://herbstluftwm.org/) для
-**Ubuntu 24.04**, собранная в процессе настройки. Цель — разворачивать на «чистом»
-Ubuntu 24 и получать тот же GUI, что и на исходной машине.
+**English** | [**Русский**](README.ru.md)
 
-## Состав репозитория
+A ready-made window manager configuration for [herbstluftwm](https://herbstluftwm.org/)
+on **Ubuntu 24.04**, assembled during an ongoing setup. Goal: deploy it on a clean
+Ubuntu 24 and get the same GUI as on the original machine.
+
+## Repository layout
 
 ```
 mylinux/
-├── README.md
-├── install.sh                    # копирует конфиг в ~/.config/herbstluftwm
+├── README.md                  # documentation (English)
+├── README.ru.md               # documentation (Russian)
+├── install.sh                 # copies the config into ~/.config/herbstluftwm
 └── herbstluftwm/
-    ├── autostart                # весь конфиг WM (клавиши, тема, правила, панель)
-    ├── panel.sh                 # dzen2-панель (таскбар, теги, сеть, звук, дата)
-    ├── xkbget.py                # текущая раскладка (по keysym, а не по индексу)
-    ├── xkbtoggle.py             # переключение ru/us через XkbLockGroup
-    ├── textwidth.py             # замер ширины текста Pango/Cairo для выравнивания панели
-    └── restart_panel.sh         # надёжный перезапуск панели (без зависания pkill)
+    ├── autostart              # full WM config (keybinds, theme, rules, panel launch)
+    ├── panel.sh               # dzen2 panel (taskbar, tags, network, sound, date)
+    ├── xkbget.py              # current keyboard layout (by keysym, not by index)
+    ├── xkbtoggle.py           # ru/us layout toggle via XkbLockGroup
+    ├── textwidth.py           # Pango/Cairo text-width measurement for panel alignment
+    └── restart_panel.sh       # reliable panel restart (never hangs on pkill)
 ```
 
-## Установка с нуля на Ubuntu 24.04
+## Fresh install on Ubuntu 24.04
 
-### 1. Системные пакеты
+### 1. System packages
 
 ```bash
 sudo apt update
@@ -30,124 +33,125 @@ sudo apt install herbstluftwm dzen2 rofi alacritty dmenu slock brightnessctl \
   python3 python3-gi python3-cairo gir1.2-pango-1.0
 ```
 
-Зависимости по назначению:
+What each dependency is for:
 
-| Пакет | Для чего |
+| Package | Purpose |
 |---|---|
-| `herbstluftwm` | сам оконный менеджер |
-| `dzen2` | панель (таскбар/теги) |
-| `rofi` | переключатель окон по Alt+Tab (список с превью) |
-| `alacritty` | терминал по `$Mod-Return` |
-| `dmenu` | `$Mod-Shift-p` (меню запуска) |
-| `slock` | блокировка экрана `$Mod-l` |
-| `brightnessctl` | клавиши/хоткеи яркости |
-| `network-manager`, `network-manager-gnome` | индикатор сети в панели + иконка в трее (`nm-applet`) |
-| `x11-xserver-utils` | `xsetroot` (сплошной фон рабочего стола) |
-| `python3-gi`, `python3-cairo`, `gir1.2-pango-1.0` | замер ширины текста (`textwidth.py`) |
+| `herbstluftwm` | the window manager itself |
+| `dzen2` | panel (taskbar/tags) |
+| `rofi` | Alt+Tab window switcher (list with previews) |
+| `alacritty` | terminal on `$Mod-Return` |
+| `dmenu` | `$Mod-Shift-p` (application launcher) |
+| `slock` | screen lock on `$Mod-l` |
+| `brightnessctl` | brightness keybinds/hotkeys |
+| `network-manager`, `network-manager-gnome` | network indicator in panel + tray icon (`nm-applet`) |
+| `x11-xserver-utils` | `xsetroot` (solid desktop background) |
+| `python3-gi`, `python3-cairo`, `gir1.2-pango-1.0` | text-width measurement (`textwidth.py`) |
 
-### 2. Шрифт
+### 2. Font
 
-Панель использует **UbuntuMono Nerd Font Mono** (размер 15). Установите семейство
-Nerd Fonts, например `UbuntuMono Nerd Font` из проекта
-[nerdfonts.com](https://www.nerdfonts.com/) (папка `~/.local/share/fonts`), затем:
+The panel uses **UbuntuMono Nerd Font Mono** (size 15). Install a Nerd Font family,
+e.g. `UbuntuMono Nerd Font` from [nerdfonts.com](https://www.nerdfonts.com/)
+(into `~/.local/share/fonts`), then:
 
 ```bash
 fc-cache -fv
 ```
 
-Если шрифта нет — панель отрисуется системным моноширинным; при желании поменяйте
-`font=` в `panel.sh`.
+Without the font the panel falls back to a system monospace font; if you prefer,
+change `font=` in `panel.sh`.
 
-### 3. Развернуть конфиг
+### 3. Deploy the config
 
 ```bash
-git clone <URL_этого_репо> ~/mylinux
+git clone <repo_URL> ~/mylinux
 cd ~/mylinux
 ./install.sh
 ```
 
-Скрипт копирует файлы в `~/.config/herbstluftwm` и делает их исполняемыми.
-В текущей сессии примените: `herbstclient reload` (или перезайдите в herbstluftwm).
+The script copies the files into `~/.config/herbstluftwm` and makes them executable.
+In a running session apply with `herbstclient reload` (or just log back into herbstluftwm).
 
-### 4. Системные настройки (вне репозитория, нужен sudo)
+### 4. System settings (outside the repo, needs sudo)
 
-Эти шаги не автоматизированы, т.к. требуют прав администратора:
+These steps are not automated because they require admin rights:
 
-**Яркость (intel_backlight)** — пользователь должен быть в группе `video`:
+**Brightness (intel_backlight)** — the user must be in the `video` group:
 ```bash
-sudo usermod -aG video $USER   # затем перелогиниться
+sudo usermod -aG video $USER   # then log back in
 ```
 
-**Раскладка на уровне системы (опционально)** — `/etc/default/keyboard`:
+**System-wide keyboard layout (optional)** — `/etc/default/keyboard`:
 ```
 XKBLAYOUT="ru,us"
 XKBOPTIONS="grp:rctrl_toggle,grp_led:scroll"
 ```
-Но помните: `autostart` и так принудительно выполняет
+Note: `autostart` already forces
 `setxkbmap -layout ru,us -option grp:alt_space_toggle -option grp_led:scroll`,
-поэтому шаг необязателен (нужен только чтобы правый Ctrl тоже переключал при входе).
+so this step is optional (only needed if you also want Right Ctrl to toggle at login).
 
-### 5. VPN / аналог V2RayTun
+### 5. VPN / V2RayTun equivalent
 
-На исходной машине установлен **Hiddify Next** (Flutter-клиент; VLESS, Trojan,
-VMess, Shadowsocks; импорт по ссылке/QR). Ставится отдельно с сайта hiddify.com.
-Конфиги живут в `~/.local/share/hiddify/` — в этот репозиторий не входят.
+On the original machine **Hiddify Next** is installed (Flutter client; VLESS, Trojan,
+VMess, Shadowsocks; import via link/QR). Install it separately from hiddify.com.
+Its configs live in `~/.local/share/hiddify/` and are not part of this repo.
 
-## Что изменено относительно чистого herbstluftwm
+## What changed vs. stock herbstluftwm
 
-### Клавиши (Mod = Mod4/Super)
+### Keybinds (Mod = Mod4/Super)
 
-| Комбинация | Действие |
+| Combination | Action |
 |---|---|
-| `Mod+Shift+p` | `dmenu_run` (поиск/запуск программ) |
-| `Mod+Shift+Space` | переключение раскладки ru/us (`xkbtoggle.py`) |
-| `Alt+Space` | переключение раскладки (через XKB) |
-| `Mod+Return` | терминал `alacritty` |
-| `Mod+F1` / `F2` / `F3` | mute / громкость −5% / +5% (`wpctl`) |
-| `Mod+F6` / `F7`, `XF86MonBrightnessDown/Up` | яркость −/+ 5% (`brightnessctl`) |
-| `Mod+l`, `Mod+Shift+l` | блокировка экрана (`slock`) |
-| `Alt+Tab`, `Alt+Shift+Tab` | **список окон с превью** (`rofi -show window`) |
-| `Mod+Tab`, `Mod+Shift+Tab` | быстрый цикл по окнам всех тегов (`cycle_all`) |
-| `Mod+i` | перейти к urgent-окну |
+| `Mod+Shift+p` | `dmenu_run` (search/launch apps) |
+| `Mod+Shift+Space` | toggle ru/us layout (`xkbtoggle.py`) |
+| `Alt+Space` | toggle layout (via XKB) |
+| `Mod+Return` | terminal `alacritty` |
+| `Mod+F1` / `F2` / `F3` | mute / volume −5% / +5% (`wpctl`) |
+| `Mod+F6` / `F7`, `XF86MonBrightnessDown/Up` | brightness −/+ 5% (`brightnessctl`) |
+| `Mod+l`, `Mod+Shift+l` | lock screen (`slock`) |
+| `Alt+Tab`, `Alt+Shift+Tab` | **window list with previews** (`rofi -show window`) |
+| `Mod+Tab`, `Mod+Shift+Tab` | quick cycle over windows on all tags (`cycle_all`) |
+| `Mod+i` | jump to urgent window |
 
-Остальное (фокус `hjkl`/стрелки, перемещение `Shift+hjkl`, сплиты `Mod+u`/`Mod+o`,
-ресайз `Mod+Control+hjkl`, теги 1–9, `Mod+space` — циклировать layout) — стоковое.
+The rest (focus `hjkl`/arrows, move `Shift+hjkl`, splits `Mod+u`/`Mod+o`,
+resize `Mod+Control+hjkl`, tags 1–9, `Mod+space` cycles layouts) is stock.
 
-### Панель (`panel.sh`, dzen2)
+### Panel (`panel.sh`, dzen2)
 
-- Шрифт `UbuntuMono Nerd Font Mono-15`, высота 22px, тёмная тема из цветов WM.
-- **Кликабельные теги** (SVN dzen): клик по тегу → переход.
-- **Таскбар**: кликабельный список окон текущего тега (клик → `herbstclient jumpto`,
-  активное окно подсвечено). Добавлен поверх стокового одного заголовка.
-- **Блоки**: `Kbd` (клик → переключение раскладки), `Bat` (батарея), `Net` (SSID/сигнал,
-  клик → `nm-connection-editor`), `Vol` (ЛКМ +5%, ПКМ −5%), дата `HH:MM DD.MM.YYYY`.
-- Колесо на панели → цикл по тегам.
-- Выравнивание правой части через реальный замер ширины `textwidth.py`
-  (Pango/Cairo), чтобы дата не уезжала за экран.
+- Font `UbuntuMono Nerd Font Mono-15`, height 22px, dark theme matching the WM colors.
+- **Clickable tags** (SVN dzen): click a tag to switch to it.
+- **Taskbar**: clickable list of windows on the current tag (click → `herbstclient jumpto`,
+  active window highlighted). Replaces the stock single window title.
+- **Blocks**: `Kbd` (click → layout toggle), `Bat` (battery), `Net` (SSID/signal,
+  click → `nm-connection-editor`), `Vol` (LMB +5%, RMB −5%), date `HH:MM DD.MM.YYYY`
+  + shortened weekday.
+- Mouse wheel on the panel cycles tags.
+- Right side aligned using real text-width measurement via `textwidth.py`
+  (Pango/Cairo), so the date never overflows off-screen.
 
-### Раскладка
+### Keyboard layout
 
-- Пара раскладок `ru,us`; переключение `XkbLockGroup` через `xkbtoggle.py`
-  (не зависит от XKB-опций).
-- `xkbget.py` определяет активный язык **по реальному keysym** клавиши `P`
-  (`p`→us / `з`→ru), а не по индексу группы — бар всегда показывает правду.
-- В `autostart` раскладка применяется дважды (сразу и через 2 с) — защита от
-  сброса SDDM/GDM при входе.
+- Layout pair `ru,us`; toggling via `XkbLockGroup` in `xkbtoggle.py`
+  (independent of XKB options).
+- `xkbget.py` detects the active language **by the real keysym** of the `P` key
+  (`p`→us / `з`→ru), not by group index — the bar always reports the truth.
+- `autostart` applies the layout twice (immediately and after 2 s) — protection
+  against SDDM/GDM resetting it during login.
 
-### Остальное
+### Everything else
 
-- `export XDG_DATA_DIRS="$XDG_DATA_DIRS:/var/lib/snapd/desktop"` — чтобы snap-приложения
-  (например, snap-VLC) находились через xdg-mime для видеоплеера.
-- `xsetroot -solid '#5A8E3A'` — зелёный фон рабочего стола.
-- Тема: активный фрейм `#345F0C`/`#9fbc00`, гап 4px, рамки, древовидный сепаратор.
-- Автостарт `nm-applet` (иконка сети в трее).
-- Служебный `restart_panel.sh` — перезапуск панели (паттерны `[h]erbstluftwm/panel.sh`,
-  не убивают саму оболочку). Запуск: `~/mylinux/herbstluftwm/restart_panel.sh`.
+- `export XDG_DATA_DIRS="$XDG_DATA_DIRS:/var/lib/snapd/desktop"` — lets snap apps
+  (e.g. snap-VLC) be found via xdg-mime for the video player.
+- `xsetroot -solid '#5A8E3A'` — green desktop background.
+- Theme: active frame `#345F0C`/`#7d9567` (soft sage), 4px gap, borders, tree separator.
+- `nm-applet` autostarted (network tray icon).
+- Helper `restart_panel.sh` — reliable panel restart (patterns `[h]erbstluftwm/panel.sh`,
+  so it never kills its own shell). Run: `~/mylinux/herbstluftwm/restart_panel.sh`.
 
-## Примечания / известные особенности
+## Notes / known quirks
 
-- **Композитора нет** — `slock` показывает чёрный экран, а миниатюры окон в rofi
-  могут быть пустыми/чёрными. Если миниатюры мешают — уберите `-window-thumbnail`
-  из keybind'ов Alt+Tab в `autostart`.
-- Для `wpctl` нужен PipeWire/WirePlumber (стоит на Ubuntu 24 по умолчанию).
-- Пути в конфиге используют `$HOME`/`~` — работает при любом имени пользователя.
+- **No compositor** — `slock` shows a black screen, and rofi window thumbnails may be
+  empty/black. If thumbnails bother you, remove `-window-thumbnail` from the Alt+Tab
+  keybinds in `autostart`.
+- `wpctl` requires PipeWire/WirePlumber (default on Ubuntu 24).
+- Config paths use `$HOME`/`~` — works with any username.
