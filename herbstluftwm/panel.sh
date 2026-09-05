@@ -122,7 +122,7 @@ hc pad $monitor $panel_height
     while true ; do
         # output is checked once a second, but a "date" event is only
         # generated if the output changed compared to the previous run.
-        printf 'date\t^fg(#efefef)%(%H:%M)T^fg(#909090) ^fg(#efefef)%(%d.%m.%Y)T\n'
+        printf 'date\t^fg(#efefef)%(%H:%M)T^fg(#909090) ^fg(#efefef)%(%d.%m.%Y %a)T\n'
         sleep 1 || break
     done > >(uniq_linebuffered) &
     pids+=($!)
