@@ -197,11 +197,10 @@ hc pad $monitor $panel_height
         echo -n "$separator"
         echo -n "$workbench"
         # small adjustments
-        right="$separator^bg() $kbd $separator^bg() $battery $separator^bg() $network $separator^bg() $volume $separator^bg() $date $separator"
+        right="$separator^bg() $kbd $separator^bg() $battery $separator^bg() $network $separator^bg() $volume $separator^bg() $date $separator^bg()^ca(1,$HOME/.config/herbstluftwm/appmenu.sh)^fg(#909090)^fn(FreeMono:size=15) ⛧  ^fn()^ca()^fg()"
         right_text_only=$(echo -n "$right" | sed 's.\^[^(]*([^)]*)..g')
-        # get width of right aligned text.. and add some space..
-        width=$($textwidth "$right_text_only    ")
-        width=$((width + 20))
+        width=$($textwidth "$right_text_only")
+        width=$((width + 6))
         echo -n "^pa($(($panel_width - $width)))$right"
         echo
 

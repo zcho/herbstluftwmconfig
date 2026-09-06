@@ -13,12 +13,16 @@ mylinux/
 ├── README.md                  # documentation (English)
 ├── README.ru.md               # documentation (Russian)
 ├── install.sh                 # copies the config into ~/.config/herbstluftwm
+├── rofi/
+│   └── config.rasi            # rofi theme (window switcher + app menu)
 └── herbstluftwm/
     ├── autostart              # full WM config (keybinds, theme, rules, panel launch)
-    ├── panel.sh               # dzen2 panel (taskbar, tags, network, sound, date)
+    ├── panel.sh               # dzen2 panel (taskbar, tags, network, sound, date, app corner)
     ├── xkbget.py              # current keyboard layout (by keysym, not by index)
     ├── xkbtoggle.py           # ru/us layout toggle via XkbLockGroup
     ├── textwidth.py           # Pango/Cairo text-width measurement for panel alignment
+    ├── apps.txt               # editable app list for the corner launcher menu
+    ├── appmenu.sh             # launcher menu (rofi) opened from the panel corner
     └── restart_panel.sh       # reliable panel restart (never hangs on pkill)
 ```
 
@@ -125,9 +129,15 @@ resize `Mod+Control+hjkl`, tags 1–9, `Mod+space` cycles layouts) is stock.
 - **Blocks**: `Kbd` (click → layout toggle), `Bat` (battery), `Net` (SSID/signal,
   click → `nm-connection-editor`), `Vol` (LMB +5%, RMB −5%), date `HH:MM DD.MM.YYYY`
   + shortened weekday.
+- **App menu in the right corner**: the subtle inverted-pentagram glyph `⛧` at the
+  right edge of the panel opens a `rofi`-based launcher menu on left-click. The list
+  is read from `apps.txt` — format `Display name<tab>command`; lines starting with
+  `#` are ignored. The glyph is drawn with FreeMono via dzen `^fn()` (UbuntuMono
+  Nerd Font lacks U+26E7).
 - Mouse wheel on the panel cycles tags.
 - Right side aligned using real text-width measurement via `textwidth.py`
-  (Pango/Cairo), so the date never overflows off-screen.
+  (Pango/Cairo), so the date never overflows off-screen (right margin kept minimal,
+  so the corner `⛧` launcher is reachable right at the screen edge).
 
 ### Keyboard layout
 
@@ -145,6 +155,9 @@ resize `Mod+Control+hjkl`, tags 1–9, `Mod+space` cycles layouts) is stock.
 - `xsetroot -solid '#5A8E3A'` — green desktop background.
 - Theme: active frame `#345F0C`/`#7d9567` (soft sage), 4px gap, borders, tree separator.
 - `nm-applet` autostarted (network tray icon).
+- **Rofi theme** (`rofi/config.rasi`): dark background `#101010`, sage accent `#7d9567`,
+  light text `#efefef` — matches the panel colors. Used by both Alt+Tab window switcher
+  and the corner app menu.
 - Helper `restart_panel.sh` — reliable panel restart (patterns `[h]erbstluftwm/panel.sh`,
   so it never kills its own shell). Run: `~/mylinux/herbstluftwm/restart_panel.sh`.
 
@@ -155,3 +168,6 @@ resize `Mod+Control+hjkl`, tags 1–9, `Mod+space` cycles layouts) is stock.
   keybinds in `autostart`.
 - `wpctl` requires PipeWire/WirePlumber (default on Ubuntu 24).
 - Config paths use `$HOME`/`~` — works with any username.
+- `mousebind` in herbstluftwm 0.9.5 supports only internal actions (`move`/`zoom`/
+  `resize`), it cannot run arbitrary commands — which is why the app launcher lives
+  in the panel corner (dzen `^ca`) instead of a desktop right-click binding.

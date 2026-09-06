@@ -1,0 +1,7 @@
+# Applications shown in the right-click menu on an empty workspace.
+# Format: Display Name<TAB>command (with any arguments/shell syntax)
+# Lines starting with '#' and empty lines are ignored.
+Chromium	chromium
+Firefox	firefox
+Alacritty	alacritty
+Files	nautilus

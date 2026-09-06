@@ -1,0 +1,79 @@
+* {
+    bg:       #101010;
+    bg-alt:   #454545;
+    fg:       #efefef;
+    accent:   #7d9567;
+    urgent:   #FF0675;
+    background-color: @bg;
+    text-color: @fg;
+}
+
+configuration {
+    font: "UbuntuMono Nerd Font Mono 12";
+    show-icons: true;
+    terminal: "alacritty";
+}
+
+window {
+    border: 1px solid;
+    border-color: @accent;
+    border-radius: 0;
+    padding: 0;
+}
+
+inputbar {
+    padding: 6px;
+    children: [ prompt, entry ];
+}
+
+prompt {
+    background-color: @accent;
+    text-color: @bg;
+    padding: 6px 10px;
+}
+
+entry {
+    padding: 6px;
+}
+
+element normal.normal {
+    background-color: @bg;
+    text-color: @fg;
+    padding: 4px 8px;
+}
+
+element normal.active {
+    background-color: @bg-alt;
+    text-color: @fg;
+}
+
+element selected {
+    background-color: @accent;
+    text-color: @bg;
+}
+
+element selected.active {
+    background-color: @accent;
+    text-color: @bg;
+}
+
+element-text {
+    background-color: inherit;
+    text-color: inherit;
+}
+
+element-icon {
+    background-color: inherit;
+    size: 1.2em;
+}
+
+scrollbar {
+    width: 4px;
+    handle-color: @accent;
+    background-color: @bg-alt;
+}
+
+listview {
+    lines: 8;
+    padding: 2px;
+}
