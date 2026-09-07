@@ -4,7 +4,7 @@ Deployable dotfiles for a **herbstluftwm 0.9.5** desktop on Ubuntu 24.04 (dzen2 
 
 ## Layout
 - `herbstluftwm/autostart` — full hlwm config (keybinds, theme colors, rules, panel launch). Autostart is re-run on `herbstclient reload`.
-- `herbstluftwm/panel.sh` — dzen2 panel: tags, clickable window taskbar (current tag), Kbd/Bat/Net/Vol/date blocks.
+- `herbstluftwm/panel.sh` — dzen2 panel: tags, clickable window taskbar (current tag), Kbd/Bat/Net/Vol/date blocks, corner `⛧` dual button (LMB app menu / RMB window switcher).
 - `herbstluftwm/{xkbget.py,xkbtoggle.py}` — layout detection/toggle via X11 ctypes (`XkbGetState`/`XkbLockGroup`).
 - `herbstluftwm/textwidth.py` — panel right-side width measurement **Pango/Cairo** (`python3-gi`, `python3-cairo`), not PIL. PIL was tried and abandoned (undermeasures ~100px).
 - `herbstluftwm/restart_panel.sh` — restarts the panel (see gotchas).

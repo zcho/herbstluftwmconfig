@@ -130,9 +130,11 @@ resize `Mod+Control+hjkl`, tags 1–9, `Mod+space` cycles layouts) is stock.
   click → `nm-connection-editor`), `Vol` (LMB +5%, RMB −5%), date `HH:MM DD.MM.YYYY`
   + shortened weekday.
 - **App menu in the right corner**: the subtle inverted-pentagram glyph `⛧` at the
-  right edge of the panel opens a `rofi`-based launcher menu on left-click. The list
-  is read from `apps.txt` — format `Display name<tab>command`; lines starting with
-  `#` are ignored. The glyph is drawn with FreeMono via dzen `^fn()` (UbuntuMono
+  right edge of the panel is a dual-action button — **left-click** opens a
+  `rofi`-based launcher menu, **right-click** opens the window switcher
+  (`rofi -show window`, same as Alt+Tab). The launcher list is read from
+  `apps.txt` — format `Display name<tab>command`; lines starting with `#` are
+  ignored. The glyph is drawn with FreeMono via dzen `^fn()` (UbuntuMono
   Nerd Font lacks U+26E7).
 - Mouse wheel on the panel cycles tags.
 - Right side aligned using real text-width measurement via `textwidth.py`
@@ -156,8 +158,8 @@ resize `Mod+Control+hjkl`, tags 1–9, `Mod+space` cycles layouts) is stock.
 - Theme: active frame `#345F0C`/`#7d9567` (soft sage), 4px gap, borders, tree separator.
 - `nm-applet` autostarted (network tray icon).
 - **Rofi theme** (`rofi/config.rasi`): dark background `#101010`, sage accent `#7d9567`,
-  light text `#efefef` — matches the panel colors. Used by both Alt+Tab window switcher
-  and the corner app menu.
+  light text `#efefef` — matches the panel colors. Used by the Alt+Tab window switcher,
+  the corner app menu, and the corner `⛧` right-click window switcher.
 - Helper `restart_panel.sh` — reliable panel restart (patterns `[h]erbstluftwm/panel.sh`,
   so it never kills its own shell). Run: `~/mylinux/herbstluftwm/restart_panel.sh`.
 

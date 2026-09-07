@@ -197,7 +197,7 @@ hc pad $monitor $panel_height
         echo -n "$separator"
         echo -n "$workbench"
         # small adjustments
-        right="$separator^bg() $kbd $separator^bg() $battery $separator^bg() $network $separator^bg() $volume $separator^bg() $date $separator^bg()^ca(1,$HOME/.config/herbstluftwm/appmenu.sh)^fg(#909090)^fn(FreeMono:size=15) ⛧  ^fn()^ca()^fg()"
+        right="$separator^bg() $kbd $separator^bg() $battery $separator^bg() $network $separator^bg() $volume $separator^bg() $date $separator^bg()^ca(1,$HOME/.config/herbstluftwm/appmenu.sh)^ca(3,rofi -show window -show-icons -window-thumbnail)^fg(#909090)^fn(FreeMono:size=15) ⛧  ^fn()^ca()^ca()^fg()"
         right_text_only=$(echo -n "$right" | sed 's.\^[^(]*([^)]*)..g')
         width=$($textwidth "$right_text_only")
         width=$((width + 6))
