@@ -48,6 +48,7 @@ hc keybind $Mod-F6               spawn brightnessctl set 5%-
 hc keybind $Mod-F7               spawn brightnessctl set 5%+
 hc keybind XF86MonBrightnessDown spawn brightnessctl set 5%-
 hc keybind XF86MonBrightnessUp   spawn brightnessctl set 5%+
+hc keybind XF86Calculator        spawn gnome-calculator
 
 
 # basic movement
