@@ -33,6 +33,7 @@ prompt {
 }
 
 entry {
+    text-color: @accent;
     padding: 6px;
 }
 
