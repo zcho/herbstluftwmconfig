@@ -84,7 +84,15 @@ hc pad $monitor $panel_height
                 Discharging) bstat='-' ;;
                 *) bstat='' ;;
             esac
-            printf 'battery\t^fg(#efefef)Bat:%s%%%s\n' "$cap" "$bstat"
+            # FontAwesome battery glyphs (in the panel's Nerd Font at U+F240-F244)
+            if   [ "$cap" -ge 90 ]; then bglyph=$(printf '\uf240')
+            elif [ "$cap" -ge 75 ]; then bglyph=$(printf '\uf241')
+            elif [ "$cap" -ge 50 ]; then bglyph=$(printf '\uf242')
+            elif [ "$cap" -ge 25 ]; then bglyph=$(printf '\uf243')
+            else                         bglyph=$(printf '\uf244')
+            fi
+            if [ "$bstat" = "+" ]; then bglyph="$(printf '\u26a1')"; fi
+            printf 'battery\t^fg(#efefef)%s%s%%%s\n' "$bglyph" "$cap" "$bstat"
         fi
         sleep 60 || break
     done > >(uniq_linebuffered) &
