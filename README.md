@@ -12,7 +12,13 @@ Ubuntu 24 and get the same GUI as on the original machine.
 mylinux/
 ├── README.md                  # documentation (English)
 ├── README.ru.md               # documentation (Russian)
-├── install.sh                 # copies the config into ~/.config/herbstluftwm
+├── install.sh                 # deploys everything into ~/.config, ~/.local
+├── alacritty/
+│   └── alacritty.yml          # terminal config (copy/paste bindings, theme)
+├── bin/
+│   └── brave-hiddify          # Brave launcher: auto proxy if Hiddify is up
+├── applications/
+│   └── brave_brave.desktop.tpl# Brave menu entry (template, $HOME-inserted on install)
 ├── rofi/
 │   └── config.rasi            # rofi theme (window switcher + app menu)
 └── herbstluftwm/
@@ -73,8 +79,10 @@ cd ~/mylinux
 ./install.sh
 ```
 
-The script copies the files into `~/.config/herbstluftwm` and makes them executable.
-In a running session apply with `herbstclient reload` (or just log back into herbstluftwm).
+The script copies the files into `~/.config/herbstluftwm`, `~/.config/rofi`,
+`~/.config/alacritty`, installs helpers into `~/.local/bin`, and generates the
+Brave desktop override in `~/.local/share/applications`. In a running session
+apply with `herbstclient reload` (or just log back into herbstluftwm).
 
 ### 4. System settings (outside the repo, needs sudo)
 
@@ -100,7 +108,34 @@ On the original machine **Hiddify Next** is installed (Flutter client; VLESS, Tr
 VMess, Shadowsocks; import via link/QR). Install it separately from hiddify.com.
 Its configs live in `~/.local/share/hiddify/` and are not part of this repo.
 
+In **proxy mode** Hiddify listens on `127.0.0.1:12334` (mixed HTTP/SOCKS). Brave
+does not pick it up automatically, so this repo ships:
+
+- `bin/brave-hiddify` — launcher that checks whether the port `12334` is up and
+  starts Brave with `--proxy-server="http://127.0.0.1:12334"` only when Hiddify is
+  running; otherwise it launches plain Brave (restart Brave after toggling Hiddify).
+- `applications/brave_brave.desktop.tpl` — snap Brave menu entry redirected to the
+  wrapper (generated into `~/.local/share/applications` by `install.sh`).
+- `herbstluftwm/apps.txt` — two launcher entries for the corner menu:
+  **Brave** (auto) and **Brave Proxy** (forced proxy).
+
+Known Hiddify quirks (verified on v2.0.5):
+- Service mode **TUN is not supported** on the Linux desktop build; setting the
+  pref `flutter.service-mode` to `tun` makes the app fail to start its core.
+  Use proxy mode only.
+- The optional `HiddifyTunnelService.service` unit ships without a `WorkingDirectory`,
+  so it dies with `error while loading shared libraries: ./lib/libcore.so`
+  (exit 127). Fix: add `WorkingDirectory=/usr/share/hiddify` to the `[Service]`
+  section, then `daemon-reload && systemctl restart`. It is only needed for TUN
+  and can be disabled otherwise.
+
 ## What changed vs. stock herbstluftwm
+
+### Alacritty
+
+- `~/.config/alacritty/alacritty.yml` (deployed from `alacritty/`): adds
+  `Ctrl+Shift+C` copy binding and `selection.save_to_clipboard: true` so text
+  selected with the mouse is copied on release.
 
 ### Keybinds (Mod = Mod4/Super)
 

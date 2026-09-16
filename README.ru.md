@@ -12,7 +12,13 @@ Ubuntu 24 и получать тот же GUI, что и на исходной �
 mylinux/
 ├── README.md                  # английская версия документации
 ├── README.ru.md               # русская версия документации
-├── install.sh                 # копирует конфиг в ~/.config/herbstluftwm
+├── install.sh                 # раскатывает всё в ~/.config, ~/.local
+├── alacritty/
+│   └── alacritty.yml          # конфиг терминала (копирование/вставка, тема)
+├── bin/
+│   └── brave-hiddify          # лаунчер Brave: авто-прокси, если Hiddify работает
+├── applications/
+│   └── brave_brave.desktop.tpl# пункт меню Brave (шаблон; $HOME подставляется при установке)
 ├── rofi/
 │   └── config.rasi            # тема rofi (переключатель окон + меню приложений)
 └── herbstluftwm/
@@ -73,8 +79,10 @@ cd ~/mylinux
 ./install.sh
 ```
 
-Скрипт копирует файлы в `~/.config/herbstluftwm` и делает их исполняемыми.
-В текущей сессии примените: `herbstclient reload` (или перезайдите в herbstluftwm).
+Скрипт копирует файлы в `~/.config/herbstluftwm`, `~/.config/rofi`,
+`~/.config/alacritty`, ставит хелперы в `~/.local/bin` и генерирует brave-override
+в `~/.local/share/applications`. В текущей сессии примените: `herbstclient reload`
+(или перезайдите в herbstluftwm).
 
 ### 4. Системные настройки (вне репозитория, нужен sudo)
 
@@ -100,7 +108,30 @@ XKBOPTIONS="grp:rctrl_toggle,grp_led:scroll"
 VMess, Shadowsocks; импорт по ссылке/QR). Ставится отдельно с сайта hiddify.com.
 Конфиги живут в `~/.local/share/hiddify/` — в этот репозиторий не входят.
 
+В режиме **proxy** Hiddify слушает `127.0.0.1:12334` (mixed HTTP/SOCKS). Brave не
+берёт его автоматически, поэтому в репозитории:
+- `bin/brave-hiddify` — лаунчер: проверяет порт `12334`, и запускает Brave с
+  `--proxy-server="http://127.0.0.1:12334"` только когда Hiddify работает; иначе —
+  обычный Brave (после включения/выключения Hiddify нужно перезапустить Brave).
+- `applications/brave_brave.desktop.tpl` — пункт меню Brave через обёртку
+  (генерируется `install.sh` в `~/.local/share/applications`).
+- `herbstluftwm/apps.txt` — два пункта в угловом меню: **Brave** (авто) и
+  **Brave Proxy** (принудительно через прокси).
+
+Проверенные особенности Hiddify v2.0.5:
+- **TUN не поддерживается** в Linux-сборке (`ServiceMode` enum — только
+  `none`/`proxy`; значение `tun` = ошибка `No element`). Используй proxy-режим.
+- Сервис `HiddifyTunnelService.service` падает с `./lib/libcore.so` (exit 127),
+  если в `[Service]` нет `WorkingDirectory=/usr/share/hiddify`. Нужен только для
+  TUN и может быть отключён.
+
 ## Что изменено относительно чистого herbstluftwm
+
+### Alacritty
+
+- `~/.config/alacritty/alacritty.yml` (из каталога `alacritty/`): добавлены
+  копирование по `Ctrl+Shift+C` и `selection.save_to_clipboard: true` — текст,
+  выделенный мышью, копируется при отпускании кнопки.
 
 ### Клавиши (Mod = Mod4/Super)
 
