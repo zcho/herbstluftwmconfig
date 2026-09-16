@@ -27,6 +27,7 @@ mylinux/
     ├── xkbget.py              # current keyboard layout (by keysym, not by index)
     ├── xkbtoggle.py           # ru/us layout toggle via XkbLockGroup
     ├── textwidth.py           # Pango/Cairo text-width measurement for panel alignment
+    ├── panel_astro.py         # sunset time + moon phase for the date block (pure stdlib)
     ├── apps.txt               # editable app list for the corner launcher menu
     ├── appmenu.sh             # launcher menu (rofi) opened from the panel corner
     └── restart_panel.sh       # reliable panel restart (never hangs on pkill)
@@ -164,6 +165,11 @@ resize `Mod+Control+hjkl`, tags 1–9, `Mod+space` cycles layouts) is stock.
 - **Blocks**: `Kbd` (click → layout toggle), `Bat` (battery), `Net` (SSID/signal,
   click → `nm-connection-editor`), `Vol` (LMB +5%, RMB −5%), date `HH:MM DD.MM.YYYY`
   + shortened weekday.
+- The date block also shows **sunset time** and **moon phase (illumination %,**
+  e.g. `☼ 18:46 ☽ 23%`), computed by `panel_astro.py` — a pure-stdlib NOAA sun
+  position + lunar phase calculation. Set your coordinates via `LAT`/`LON` at the
+  top of `panel.sh` (defaults to Moscow). Glyphs are FreeMono `^fn()` (the panel's
+  Nerd Font lacks them); the calculation refreshes once per minute.
 - **App menu in the right corner**: the subtle inverted-pentagram glyph `⛧` at the
   right edge of the panel is a dual-action button — **left-click** opens a
   `rofi`-based launcher menu, **right-click** opens the window switcher

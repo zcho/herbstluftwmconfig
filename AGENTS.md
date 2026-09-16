@@ -7,6 +7,7 @@ Deployable dotfiles for a **herbstluftwm 0.9.5** desktop on Ubuntu 24.04 (dzen2 
 - `herbstluftwm/panel.sh` — dzen2 panel: tags, clickable window taskbar (current tag), Kbd/Bat/Net/Vol/date blocks, corner `⛧` dual button (LMB app menu / RMB window switcher).
 - `herbstluftwm/{xkbget.py,xkbtoggle.py}` — layout detection/toggle via X11 ctypes (`XkbGetState`/`XkbLockGroup`).
 - `herbstluftwm/textwidth.py` — panel right-side width measurement **Pango/Cairo** (`python3-gi`, `python3-cairo`), not PIL. PIL was tried and abandoned (undermeasures ~100px).
+- `herbstluftwm/panel_astro.py` — sunset time (NOAA sun position) + moon illumination %, pure stdlib. Takes `LAT LON` args, prints a dzen markup line (FreeMono `^fn()` glyphs). Coordinates are `LAT`/`LON` at the top of `panel.sh`.
 - `herbstluftwm/apps.txt` — launcher list for the corner menu. Also lives at `~/.config/herbstluftwm/apps.txt`; keep both in sync.
 - `alacritty/alacritty.yml` — terminal config with `Ctrl+Shift+C` copy + `save_to_clipboard` (deployed to `~/.config/alacritty/`).
 - `bin/brave-hiddify` — Brave launcher: adds `--proxy-server="http://127.0.0.1:12334"` only while Hiddify's mixed port 12334 listens; otherwise plain Brave (`ss -ltn | grep 127.0.0.1:12334` decides).
@@ -19,6 +20,8 @@ Deployable dotfiles for a **herbstluftwm 0.9.5** desktop on Ubuntu 24.04 (dzen2 
 - **Hiddify (v2.0.5) has no TUN on Linux desktop**: the `ServiceMode` enum only carries `none`/`proxy`. Setting pref `flutter.service-mode` to `tun` breaks core startup (`No element`). Proxy mode is the only working mode; mixed inbound is `127.0.0.1:12334`.
 - **HiddifyTunnelService.service dies with `./lib/libcore.so` (exit 127)** unless the unit has `WorkingDirectory=/usr/share/hiddify` in `[Service]`. It is only needed for TUN mode (currently unused).
 - **Colors**: the bright active color lives in TWO separate keys that must stay in sync: `theme.active.color` (window frame) and `window_border_active_color` (panel `selbg`, read directly by `panel.sh`). The latter is not set in stock config and must be set explicitly.
+- **bash `printf` `%(...)T` grabs the next argument**: the date-loop line uses THREE separate `printf` runs (`$t`, `$d`, `$astro`) because putting `%(...)T` in the same format as `%s` makes the time iterator consume the `%s` argument. Do not "simplify" back to one format string.
+- **Sun/moon glyphs** (☼ U+263C, ☽ U+263D) are missing from UbuntuMono Nerd Font Mono; they render only because `panel_astro.py` wraps them in `^fn(FreeMono:size=15)`. FreeMono coverage is verified (`fc-query`): U+263C/263D/263E/2600/26E7/2193.
 - **hlwm 0.9.5 has no `activate` command** — use `jumpto <winid>` to focus a window (it also switches tag).
 - **Portability**: keep paths `$HOME`/`~`-relative; never reintroduce `/home/zcho` hardcodes (verify with `grep -rn "zcho\\|/home/" herbstluftwm/ install.sh`; the `.tpl` uses `__HIDDIFY_WRAPPER__` instead).
 - **`restart_panel.sh`** uses pkill patterns with `[h]erbstluftwm/panel.sh` / `[d]zen2 -w` bracket trick so it doesn't kill its own shell. On the live machine a copy may live at `/tmp/restart_panel.sh` (recreate from repo if /tmp was cleared).
@@ -29,6 +32,6 @@ Deployable dotfiles for a **herbstluftwm 0.9.5** desktop on Ubuntu 24.04 (dzen2 
 - Apply config: `herbstclient reload`
 - Restart panel: `restart_panel.sh` (from repo, or `/tmp/restart_panel.sh` on the machine)
 - Validate: `bash -n` on `*.sh` (autostart/panel.sh/restart_panel.sh/install.sh); `python3 -m py_compile herbstluftwm/*.py`
-- Sync live→repo: `cp ~/.config/herbstluftwm/{autostart,panel.sh,xkbget.py,xkbtoggle.py,textwidth.py} herbstluftwm/`
+- Sync live→repo: `cp ~/.config/herbstluftwm/{autostart,panel.sh,panel_astro.py,xkbget.py,xkbtoggle.py,textwidth.py} herbstluftwm/`
 - Deploy repo→live: `./install.sh`
 - Commit/push only when the user asks (they do so explicitly).

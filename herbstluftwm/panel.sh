@@ -31,6 +31,12 @@ selbg=$(hc get window_border_active_color|sed 's,^\(\#[0-9a-f]\{6\}\)[0-9a-f]\{2
 selfg='#101010'
 
 ####
+# Sunset / moon phase in the date block (Moscow default; change to your coords)
+LAT=55.7558
+LON=37.6173
+panel_astro="$HOME/.config/herbstluftwm/panel_astro.py"
+
+####
 # XFT text width measurement via PIL (works with TTF/Nerd Fonts)
 textwidth="$HOME/.config/herbstluftwm/textwidth.py"
 ####
@@ -122,7 +128,14 @@ hc pad $monitor $panel_height
     while true ; do
         # output is checked once a second, but a "date" event is only
         # generated if the output changed compared to the previous run.
-        printf 'date\t^fg(#efefef)%(%H:%M)T^fg(#909090) ^fg(#efefef)%(%d.%m.%Y %a)T\n'
+        # astro (sunset/moon) is recomputed once per minute.
+        if [ "$(printf '%(%d%m%H%M)T')" != "$astro_when" ]; then
+            astro="$(python3 "$panel_astro" "$LAT" "$LON" 2>/dev/null)"
+            astro_when="$(printf '%(%d%m%H%M)T')"
+        fi
+        t="$(printf '%(%H:%M)T')"
+        d="$(printf '%(%d.%m.%Y %a)T')"
+        printf 'date\t^fg(#efefef)%s^fg(#909090) ^fg(#efefef)%s^fg(#7d9567) %s^fg()\n' "$t" "$d" "$astro"
         sleep 1 || break
     done > >(uniq_linebuffered) &
     pids+=($!)
