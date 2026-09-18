@@ -118,7 +118,7 @@ hc pad $monitor $panel_height
     while true ; do
         lay=$(~/.config/herbstluftwm/xkbget.py 2>/dev/null)
         [ -z "$lay" ] && lay="us"
-        printf 'kbd\t^fg(#efefef)Kbd:^ca(1,python3 $HOME/.config/herbstluftwm/xkbtoggle.py)%s^ca()\n' "$lay"
+        printf 'kbd\t^fg(#efefef)^ca(1,python3 $HOME/.config/herbstluftwm/xkbtoggle.py)%s^ca()\n' "$lay"
         sleep 0.5 || break
     done > >(uniq_linebuffered) &
     pids+=($!)

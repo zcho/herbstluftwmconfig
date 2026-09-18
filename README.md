@@ -162,7 +162,7 @@ resize `Mod+Control+hjkl`, tags 1–9, `Mod+space` cycles layouts) is stock.
 - **Clickable tags** (SVN dzen): click a tag to switch to it.
 - **Taskbar**: clickable list of windows on the current tag (click → `herbstclient jumpto`,
   active window highlighted). Replaces the stock single window title.
-- **Blocks**: `Kbd` (click → layout toggle), battery (level-adaptive FontAwesome
+- **Blocks**: layout `ru`/`us` (click → layout toggle), battery (level-adaptive FontAwesome
   glyph ``…``, replaced by ⚡ while charging), `Net` (SSID/signal,
   click → `nm-connection-editor`), `Vol` (LMB +5%, RMB −5%), date `HH:MM DD.MM.YYYY`
   + shortened weekday.
