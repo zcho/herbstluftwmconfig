@@ -163,7 +163,8 @@ resize `Mod+Control+hjkl`, tags 1–9, `Mod+space` cycles layouts) is stock.
 - **Taskbar**: clickable list of windows on the current tag (click → `herbstclient jumpto`,
   active window highlighted). Replaces the stock single window title.
 - **Blocks**: layout `ru`/`us` (click → layout toggle), battery (level-adaptive FontAwesome
-  glyph ``…``, replaced by ⚡ while charging), `Net` (SSID/signal,
+  glyph ``…``, ⚡ while charging; **left-click → tooltip** with remaining-time / time-to-full
+  estimate + current draw W, see `panel_batip.py`), `Net` (SSID/signal,
   click → `nm-connection-editor`), `Vol` (LMB +5%, RMB −5%), date `HH:MM DD.MM.YYYY`
   + shortened weekday.
 - The date block also shows **sunset time** and **moon phase (illumination %,**

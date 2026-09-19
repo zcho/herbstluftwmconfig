@@ -32,6 +32,6 @@ Deployable dotfiles for a **herbstluftwm 0.9.5** desktop on Ubuntu 24.04 (dzen2 
 - Apply config: `herbstclient reload`
 - Restart panel: `restart_panel.sh` (from repo, or `/tmp/restart_panel.sh` on the machine)
 - Validate: `bash -n` on `*.sh` (autostart/panel.sh/restart_panel.sh/install.sh); `python3 -m py_compile herbstluftwm/*.py`
-- Sync live→repo: `cp ~/.config/herbstluftwm/{autostart,panel.sh,panel_astro.py,xkbget.py,xkbtoggle.py,textwidth.py} herbstluftwm/`
+- Sync live→repo: `cp ~/.config/herbstluftwm/{autostart,panel.sh,panel_astro.py,panel_batip.py,xkbglyph.py,xkbget.py,xkbtoggle.py,textwidth.py} herbstluftwm/`
 - Deploy repo→live: `./install.sh`
 - Commit/push only when the user asks (they do so explicitly).

@@ -92,7 +92,7 @@ hc pad $monitor $panel_height
             else                         bglyph=$(printf '\uf244')
             fi
             if [ "$bstat" = "+" ]; then bglyph="$(printf '\u26a1')"; fi
-            printf 'battery\t^fg(#efefef)%s%s%%%s\n' "$bglyph" "$cap" "$bstat"
+            printf 'battery\t^fg(#efefef)^ca(1,python3 $HOME/.config/herbstluftwm/panel_batip.py)%s%s%%%s^ca()\n' "$bglyph" "$cap" "$bstat"
         fi
         sleep 60 || break
     done > >(uniq_linebuffered) &
