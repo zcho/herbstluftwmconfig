@@ -16,7 +16,8 @@ mylinux/
 ├── alacritty/
 │   └── alacritty.yml          # конфиг терминала (копирование/вставка, тема)
 ├── bin/
-│   └── brave-hiddify          # лаунчер Brave: авто-прокси, если Hiddify работает
+│   ├── brave-hiddify          # лаунчер Brave: авто-прокси, если Hiddify работает
+│   └── telegram-hiddify       # лаунчер Telegram: через proxychains → Hiddify
 ├── applications/
 │   └── brave_brave.desktop.tpl# пункт меню Brave (шаблон; $HOME подставляется при установке)
 ├── rofi/
@@ -30,7 +31,8 @@ mylinux/
     ├── panel_astro.py         # время заката + фаза луны для блока даты (чистый stdlib)
     ├── apps.txt               # редактируемый список приложений для углового меню
     ├── appmenu.sh             # меню запуска (rofi) по клику в угол панели
-    └── restart_panel.sh       # надёжный перезапуск панели (без зависания pkill)
+    ├── restart_panel.sh       # надёжный перезапуск панели (без зависания pkill)
+    └── proxychains.conf       # конфиг proxychains для mixed-порта Hiddify (12334)
 ```
 
 ## Установка с нуля на Ubuntu 24.04
@@ -41,7 +43,7 @@ mylinux/
 sudo apt update
 sudo apt install herbstluftwm dzen2 rofi alacritty dmenu slock brightnessctl \
   network-manager network-manager-gnome x11-xserver-utils \
-  python3 python3-gi python3-cairo gir1.2-pango-1.0
+  python3 python3-gi python3-cairo gir1.2-pango-1.0 proxychains4
 ```
 
 Зависимости по назначению:
@@ -58,6 +60,7 @@ sudo apt install herbstluftwm dzen2 rofi alacritty dmenu slock brightnessctl \
 | `network-manager`, `network-manager-gnome` | индикатор сети в панели + иконка в трее (`nm-applet`) |
 | `x11-xserver-utils` | `xsetroot` (сплошной фон рабочего стола) |
 | `python3-gi`, `python3-cairo`, `gir1.2-pango-1.0` | замер ширины текста (`textwidth.py`) |
+| `proxychains4` | проксирует трафик Telegram через Hiddify |
 
 ### 2. Шрифт
 
@@ -116,8 +119,20 @@ VMess, Shadowsocks; импорт по ссылке/QR). Ставится отд�
   обычный Brave (после включения/выключения Hiddify нужно перезапустить Brave).
 - `applications/brave_brave.desktop.tpl` — пункт меню Brave через обёртку
   (генерируется `install.sh` в `~/.local/share/applications`).
-- `herbstluftwm/apps.txt` — два пункта в угловом меню: **Brave** (авто) и
-  **Brave Proxy** (принудительно через прокси).
+- `herbstluftwm/apps.txt` — пункты углового меню: **Brave** (авто),
+  **Brave Proxy** (принудительно через прокси) и **Telegram**.
+
+Telegram Desktop также не берёт прокси сам, и его домены обычно заблокированы,
+поэтому он запускается через `proxychains4`:
+
+- `bin/telegram-hiddify` — лаунчер: запускает Telegram через
+  `proxychains4 -f ~/.config/herbstluftwm/proxychains.conf`; если
+  `proxychains4` не установлен — обычный запуск.
+- `herbstluftwm/proxychains.conf` — конфиг proxychains, указывающий на mixed-порт
+  Hiddify `127.0.0.1:12334` (кладётся в `~/.config/herbstluftwm/` скриптом
+  `install.sh`).
+- `herbstluftwm/apps.txt` — пункт **Telegram** в угловом меню запускает
+  обёртку выше.
 
 Проверенные особенности Hiddify v2.0.5:
 - **TUN не поддерживается** в Linux-сборке (`ServiceMode` enum — только

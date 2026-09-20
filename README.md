@@ -16,7 +16,8 @@ mylinux/
 ├── alacritty/
 │   └── alacritty.yml          # terminal config (copy/paste bindings, theme)
 ├── bin/
-│   └── brave-hiddify          # Brave launcher: auto proxy if Hiddify is up
+│   ├── brave-hiddify          # Brave launcher: auto proxy if Hiddify is up
+│   └── telegram-hiddify       # Telegram launcher: via proxychains → Hiddify
 ├── applications/
 │   └── brave_brave.desktop.tpl# Brave menu entry (template, $HOME-inserted on install)
 ├── rofi/
@@ -30,7 +31,8 @@ mylinux/
     ├── panel_astro.py         # sunset time + moon phase for the date block (pure stdlib)
     ├── apps.txt               # editable app list for the corner launcher menu
     ├── appmenu.sh             # launcher menu (rofi) opened from the panel corner
-    └── restart_panel.sh       # reliable panel restart (never hangs on pkill)
+    ├── restart_panel.sh       # reliable panel restart (never hangs on pkill)
+    └── proxychains.conf       # proxychains config for Hiddify mixed port (12334)
 ```
 
 ## Fresh install on Ubuntu 24.04
@@ -41,7 +43,7 @@ mylinux/
 sudo apt update
 sudo apt install herbstluftwm dzen2 rofi alacritty dmenu slock brightnessctl \
   network-manager network-manager-gnome x11-xserver-utils \
-  python3 python3-gi python3-cairo gir1.2-pango-1.0
+  python3 python3-gi python3-cairo gir1.2-pango-1.0 proxychains4
 ```
 
 What each dependency is for:
@@ -58,6 +60,7 @@ What each dependency is for:
 | `network-manager`, `network-manager-gnome` | network indicator in panel + tray icon (`nm-applet`) |
 | `x11-xserver-utils` | `xsetroot` (solid desktop background) |
 | `python3-gi`, `python3-cairo`, `gir1.2-pango-1.0` | text-width measurement (`textwidth.py`) |
+| `proxychains4` | routes Telegram through the Hiddify proxy |
 
 ### 2. Font
 
@@ -117,8 +120,20 @@ does not pick it up automatically, so this repo ships:
   running; otherwise it launches plain Brave (restart Brave after toggling Hiddify).
 - `applications/brave_brave.desktop.tpl` — snap Brave menu entry redirected to the
   wrapper (generated into `~/.local/share/applications` by `install.sh`).
-- `herbstluftwm/apps.txt` — two launcher entries for the corner menu:
-  **Brave** (auto) and **Brave Proxy** (forced proxy).
+- `herbstluftwm/apps.txt` — launcher entries for the corner menu: **Brave**
+  (auto), **Brave Proxy** (forced proxy) and **Telegram**.
+
+Telegram Desktop does not pick up the proxy automatically either, and its domains
+are commonly blocked, so it is launched through `proxychains4`:
+
+- `bin/telegram-hiddify` — launch wrapper: runs Telegram via
+  `proxychains4 -f ~/.config/herbstluftwm/proxychains.conf`; falls back to a
+  plain launch if `proxychains4` is not installed.
+- `herbstluftwm/proxychains.conf` — proxychains config pointing at the Hiddify
+  mixed port `127.0.0.1:12334` (deployed to `~/.config/herbstluftwm/` by
+  `install.sh`).
+- `herbstluftwm/apps.txt` — the **Telegram** corner-menu entry launches the
+  wrapper above.
 
 Known Hiddify quirks (verified on v2.0.5):
 - Service mode **TUN is not supported** on the Linux desktop build; setting the
