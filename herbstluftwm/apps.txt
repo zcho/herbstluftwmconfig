@@ -3,6 +3,7 @@
 # Lines starting with '#' and empty lines are ignored.
 Chromium	chromium
 Firefox	firefox
+Telegram	~/.local/bin/telegram-hiddify
 Brave	~/.local/bin/brave-hiddify
 Brave Proxy	/snap/bin/brave --proxy-server="http://127.0.0.1:12334"
 Alacritty	alacritty

@@ -1,0 +1,11 @@
+#!/bin/bash
+# Telegram launcher: route through Hiddify (127.0.0.1:12334) via proxychains,
+# falling back to a plain launch if proxychains is unavailable.
+conf="$HOME/.config/herbstluftwm/proxychains.conf"
+tg="$HOME/Applications/Telegram/Telegram"
+workdir="$HOME/.local/share/TelegramDesktop/"
+if command -v proxychains4 >/dev/null 2>&1 && [ -f "$conf" ]; then
+    exec proxychains4 -f "$conf" "$tg" -workdir "$workdir" "$@"
+else
+    exec "$tg" -workdir "$workdir" "$@"
+fi
