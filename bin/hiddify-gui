@@ -1,0 +1,19 @@
+#!/bin/bash
+# Hiddify GUI launcher: raises the running window, or starts the app.
+# Hiddify 2.x is not single-instance on Linux, a second launch spawns another
+# copy of the process. If hlwm already manages a Hiddify window, focus that one
+# instead of starting a duplicate. Falls back to a plain launch when hlwm is not
+# running (or the window is still starting up and not registered yet).
+# The proxy tunnel itself is handled by the HiddifyTunnelService systemd unit.
+HIDDIFY=/usr/bin/hiddify
+
+if command -v herbstclient >/dev/null 2>&1; then
+    for win in $(herbstclient list_clients 2>/dev/null); do
+        if [ "$(herbstclient attr "clients.$win.class" 2>/dev/null)" = "Hiddify" ]; then
+            exec herbstclient jumpto "$win"
+        fi
+    done
+fi
+
+setsid nohup "$HIDDIFY" >/dev/null 2>&1 &
+exit 0

@@ -1,7 +1,23 @@
 #!/usr/bin/env bash
 
-# include snap desktop files (VLC etc.) in XDG search path
-export XDG_DATA_DIRS="$XDG_DATA_DIRS:/var/lib/snapd/desktop"
+# XDG data search path: standard dirs + snap's, added idempotently (autostart is
+# re-run on every `herbstclient reload`, a plain append piles up duplicates and
+# stray empty entries). This also self-heals a value that lost /usr/share:
+# without it GLib finds no GSettings schemas, at-spi-dbus-bus and
+# xdg-desktop-portal abort with status=5/TRAP, dbus activation stalls 120s, and
+# GUI windows take minutes to appear.
+_xdg_add() {
+    case ":$XDG_DATA_DIRS:" in
+        *":$1:"*) ;;
+        *) XDG_DATA_DIRS="${XDG_DATA_DIRS:+$XDG_DATA_DIRS:}$1" ;;
+    esac
+}
+_xdg_add /usr/local/share
+_xdg_add /usr/share
+_xdg_add /usr/share/herbstluftwm
+_xdg_add /var/lib/snapd/desktop
+export XDG_DATA_DIRS
+unset -f _xdg_add
 
 # this is a simple config for herbstluftwm
 

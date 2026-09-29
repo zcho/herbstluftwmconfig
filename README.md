@@ -210,8 +210,16 @@ resize `Mod+Control+hjkl`, tags 1–9, `Mod+space` cycles layouts) is stock.
 
 ### Everything else
 
-- `export XDG_DATA_DIRS="$XDG_DATA_DIRS:/var/lib/snapd/desktop"` — lets snap apps
-  (e.g. snap-VLC) be found via xdg-mime for the video player.
+- `autostart` builds `XDG_DATA_DIRS` idempotently (standard dirs + snap's) instead of a
+  plain append — the old `export XDG_DATA_DIRS="$XDG_DATA_DIRS:/var/lib/snapd/desktop"` piled
+  up duplicates on every `herbstclient reload` and left stray empty entries. It also
+  **self-heals a value that lost `/usr/share`**: GLib only looks for GSettings schemas under
+  `$XDG_DATA_DIRS/glib-2.0/schemas`, so a missing `/usr/share` makes `gsettings` report
+  "No schemas installed", which kills `at-spi-dbus-bus` and `xdg-desktop-portal{,-gtk}` with
+  `status=5/TRAP` and stalls every dbus activation of them for the full 120 s. GUI apps that
+  wait on those services look hung (Hiddify took ~2.5 min to map its window, now 2 s).
+  `~/.config/environment.d/10-xdg-data-dirs.conf` covers the systemd user services, which
+  `autostart` cannot reach.
 - `xsetroot -solid '#5A8E3A'` — green desktop background.
 - Theme: active frame `#345F0C`/`#7d9567` (soft sage), 4px gap, borders, tree separator.
 - `nm-applet` autostarted (network tray icon).

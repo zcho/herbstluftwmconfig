@@ -204,8 +204,17 @@ Telegram Desktop также не берёт прокси сам, и его до�
 
 ### Остальное
 
-- `export XDG_DATA_DIRS="$XDG_DATA_DIRS:/var/lib/snapd/desktop"` — чтобы snap-приложения
-  (например, snap-VLC) находились через xdg-mime для видеоплеера.
+- `autostart` собирает `XDG_DATA_DIRS` идемпотентно (стандартные каталоги + snap-овский),
+  а не простым дописыванием: старая строка
+  `export XDG_DATA_DIRS="$XDG_DATA_DIRS:/var/lib/snapd/desktop"` накапливала дубликаты при
+  каждом `herbstclient reload` и оставляла пустые элементы. Заодно она **лечит значение, из
+  которого потерялся `/usr/share`**: GLib ищет схемы GSettings только в
+  `$XDG_DATA_DIRS/glib-2.0/schemas`, поэтому без `/usr/share` команда `gsettings` отвечает
+  «No schemas installed», из-за чего `at-spi-dbus-bus` и `xdg-desktop-portal{,-gtk}` падают
+  с `status=5/TRAP`, и любая их активация через dbus виснет на полные 120 с. GUI-приложения,
+  которые ждут эти сервисы, выглядят зависшими (Hiddify раньше открывал окно ~2.5 мин,
+  теперь 2 с). За systemd-сервисы пользователя отвечает
+  `~/.config/environment.d/10-xdg-data-dirs.conf` — `autostart` их не достаёт.
 - `xsetroot -solid '#5A8E3A'` — зелёный фон рабочего стола.
 - Тема: активный фрейм `#345F0C`/`#7d9567` (мягкий sage), гап 4px, рамки, древовидный сепаратор.
 - Автостарт `nm-applet` (иконка сети в трее).

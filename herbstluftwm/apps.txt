@@ -8,3 +8,4 @@ Brave	~/.local/bin/brave-hiddify
 Brave Proxy	/snap/bin/brave --proxy-server="http://127.0.0.1:12334"
 Alacritty	alacritty
 Files	nautilus
+Hiddify	~/.local/bin/hiddify-gui

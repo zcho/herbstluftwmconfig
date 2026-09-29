@@ -11,6 +11,7 @@ Deployable dotfiles for a **herbstluftwm 0.9.5** desktop on Ubuntu 24.04 (dzen2 
 - `herbstluftwm/apps.txt` — launcher list for the corner menu. Also lives at `~/.config/herbstluftwm/apps.txt`; keep both in sync.
 - `alacritty/alacritty.yml` — terminal config with `Ctrl+Shift+C` copy + `save_to_clipboard` (deployed to `~/.config/alacritty/`).
 - `bin/brave-hiddify` — Brave launcher: adds `--proxy-server="http://127.0.0.1:12334"` only while Hiddify's mixed port 12334 listens; otherwise plain Brave (`ss -ltn | grep 127.0.0.1:12334` decides).
+- `bin/hiddify-gui` — Hiddify launcher, used by the `Hiddify` entry in `apps.txt` (corner `⛧` menu). Raises the existing hlwm window (`jumpto`) instead of starting a second copy. `install.sh` copies `bin/*` automatically — no install.sh change needed for new helpers.
 - `applications/*.tpl` — desktop overrides; `install.sh` renders them (sed `__HIDDIFY_WRAPPER__` → `$HOME/.local/bin/brave-hiddify`). Never commit an absolute `/home/zcho` path in the `.tpl`.
 - `herbstluftwm/restart_panel.sh` — restarts the panel (see gotchas).
 - `install.sh` — deploys hlwm/rofi/alacritty/`bin`/desktop overrides. README.md is the setup manual (Russian).
@@ -26,6 +27,8 @@ Deployable dotfiles for a **herbstluftwm 0.9.5** desktop on Ubuntu 24.04 (dzen2 
 - **Portability**: keep paths `$HOME`/`~`-relative; never reintroduce `/home/zcho` hardcodes (verify with `grep -rn "zcho\\|/home/" herbstluftwm/ install.sh`; the `.tpl` uses `__HIDDIFY_WRAPPER__` instead).
 - **`restart_panel.sh`** uses pkill patterns with `[h]erbstluftwm/panel.sh` / `[d]zen2 -w` bracket trick so it doesn't kill its own shell. On the live machine a copy may live at `/tmp/restart_panel.sh` (recreate from repo if /tmp was cleared).
 - **`xkbget.py`** detects layout by the keysym of keycode 33 (`P`): `p`(0x70)→`us`, `з`(0x6da)→`ru`. Do not "simplify" it to a group-index lookup — that was the actual historical bug.
+- **`XDG_DATA_DIRS` must contain `/usr/share`**: GLib only looks for GSettings schemas in `$XDG_DATA_DIRS/glib-2.0/schemas`. `/etc/X11/Xsession.d/60x11-common_xdg_path` can yield a value missing `/usr/share` → `gsettings list-schemas` says "No schemas installed" → `at-spi-dbus-bus` + `xdg-desktop-portal{,-gtk}` die with `status=5/TRAP` and every dbus activation stalls the full 120 s. Symptom: GUI windows that wait on those services take minutes to map (Hiddify: 170 s → 2 s once fixed). Fixed in two places because neither covers the other: `herbstluftwm/autostart` (hlwm-launched apps, self-healing + idempotent) and `~/.config/environment.d/10-xdg-data-dirs.conf` (systemd user services, needs next login). Diagnose with `gsettings list-schemas | head -1` — "No schemas installed" means the path is broken.
+- **Hiddify (v2.0.5) is not single-instance on Linux**: a second `/usr/bin/hiddify` spawns another process and a second window. Any launcher must raise the running window (`herbstclient jumpto`) instead of exec'ing the binary. Stale `~/.local/share/hiddify/command.sock` (left by a killed instance) makes the next launch hang at `initializing [window controller]` with an unmapped 10x10 window; delete the socket when no GUI process is running.
 - Right after `herbstclient reload`, attribute reads can race autostart and show stale values; re-query.
 
 ## Commands
