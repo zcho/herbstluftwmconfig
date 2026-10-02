@@ -1,8 +1,11 @@
 #!/usr/bin/env python3
 # Всплывающая подсказка по батарее (dzen2-попап под панелью, запускается левым кликом
-# на блок батареи в panel.sh). Оценка времени остатка/заряда — из sysfs прямо по току:
+# на блок батареи в panel.sh). Заголовок — время работы от батареи, вторая строка —
+# процент и мощность. Оценка времени остатка/заряда — из sysfs прямо по току:
 #   разряд:   (charge_now * 60) / current_now  [мин]
 #   заряд:    ((charge_full - charge_now) * 60) / current_now
+# ETA отбрасывается как неправдоподобный (см. PLAUSIBLE_*): при status=Full и
+# токе холостого хода current_now даёт оценку в десятки суток.
 # Чистый stdlib, зависимости не нужны. Закрывается кликом (button1/button3).
 import os
 import subprocess
@@ -16,6 +19,10 @@ FW = "#efefef"
 DIM = "#909090"
 ACC = "#7d9567"
 BG = "#101010"
+
+# Разумные границы оценки времени: всё, что вне их — мусор из sysfs, а не правда.
+PLAUSIBLE_MIN = 2  # мин
+PLAUSIBLE_MAX = 36 * 60  # мин
 
 
 def read_int(entry):
@@ -42,6 +49,16 @@ def fmt_minutes(minutes):
     if h:
         return "%d ч" % h
     return "%d мин" % minutes
+
+
+def eta_minutes(energy_now, current_now):
+    """Оценка времени по току; None, если ток/энергия неизвестны или оценка неправдоподобна."""
+    if energy_now <= 0 or current_now <= 0:
+        return None
+    minutes = energy_now / current_now * 60
+    if not PLAUSIBLE_MIN <= minutes <= PLAUSIBLE_MAX:
+        return None
+    return minutes
 
 
 def kill_previous():
@@ -73,28 +90,37 @@ def main():
     current_now = abs(read_int("current_now"))
     voltage_now = abs(read_int("voltage_now"))
 
-    line1 = "^fg(%s)Батарея %d%%" % (FW, cap)
+    # На некоторых прошивках charge_now/charge_full не экспортируются — берём capacity.
+    if charge_full <= 0:
+        charge_full = 1000000
+    if charge_now <= 0:
+        charge_now = int(charge_full * cap / 100)
 
-    if current_now == 0 or charge_full == 0:
-        power = ""
-    else:
-        power = " · %s %.1f Вт" % (DIM, current_now * voltage_now / 1e12)
+    watts = current_now * voltage_now / 1e12 if current_now and voltage_now else 0.0
+    # DIM обязан быть обёрнут в ^fg(), иначе dzen2 напечатает "#909090" как текст.
+    power = " · ^fg(%s)%.1f Вт" % (DIM, watts) if watts else ""
 
-    if status == "Charging":
-        rem = charge_full - charge_now
-        if rem > 0 and current_now > 0:
-            eta = rem / current_now * 60
-            line2 = "^fg(%s)до полного ~%s%s" % (ACC, fmt_minutes(eta), power)
+    if status == "Discharging":
+        eta = eta_minutes(charge_now, current_now)
+        if eta:
+            line1 = "^fg(%s)Осталось ~%s" % (ACC, fmt_minutes(eta))
         else:
-            line2 = "^fg(%s)заряжена%s" % (ACC, power)
-    elif status == "Discharging":
-        if charge_now > 0 and current_now > 0:
-            eta = charge_now / current_now * 60
-            line2 = "^fg(%s)хватит на ~%s%s" % (ACC, fmt_minutes(eta), power)
+            line1 = "^fg(%s)Осталось неизвестно" % ACC
+        line2 = "^fg(%s)%d%%%s" % (FW, cap, power)
+    elif status == "Charging":
+        eta = eta_minutes(charge_full - charge_now, current_now)
+        if eta:
+            line1 = "^fg(%s)До полного ~%s" % (ACC, fmt_minutes(eta))
         else:
-            line2 = "^fg(%s)ток неизвестен%s" % (ACC, power)
+            line1 = "^fg(%s)До полного неизвестно" % ACC
+        line2 = "^fg(%s)%d%%%s" % (FW, cap, power)
+    elif cap >= 100:
+        # Полный заряд: времени работы не существует, пока батарея не разрядится.
+        line1 = "^fg(%s)Заряжена полностью" % ACC
+        line2 = "^fg(%s)%d%%%s" % (FW, cap, power)
     else:
-        line2 = "^fg(%s)состояние: %s" % (ACC, status)
+        line1 = "^fg(%s)Заряд не идёт" % ACC
+        line2 = "^fg(%s)%d%%%s%s" % (FW, cap, power, "" if status == "Not charging" else " · %s" % status)
 
     w, h = monitor_geom()
     pop_w = 340
