@@ -126,8 +126,18 @@ does not pick it up automatically, so this repo ships:
   - `applications/brave_brave.desktop.tpl` — snap Brave menu entry redirected to the
     wrapper (generated into `~/.local/share/applications` by `install.sh`). Every action,
     including *New Incognito Window*, goes through the wrapper.
+  - `herbstluftwm/brave-bypass.list` — hosts that go **direct** while everything else stays
+    proxied (`~/.config/herbstluftwm/brave-bypass.list`, one rule per line, `#` comments).
+    Ships with `<local>` and the private LAN ranges enabled. Chromium matches rules against the
+    URL host, so `*.example.com` does **not** cover `example.com` — list both.
   - `herbstluftwm/apps.txt` — launcher entries for the corner menu: **Brave** (via the
     wrapper) and **Telegram**.
+
+  The proxy is a property of the whole process, not of a tab, so the bypass list is
+  per-*domain*: a tab opened on a bypassed domain connects directly while YouTube stays
+  proxied. Two tabs on the *same* domain cannot differ — that needs either a second Brave
+  instance (`--user-data-dir`, verified to coexist) or a `chrome.proxy` extension such as
+  FoxyProxy/SwitchyOmega.
 
 Telegram Desktop does not pick up the proxy automatically either, and its domains
 are commonly blocked, so it is launched through `proxychains4`:

@@ -1,0 +1,23 @@
+# Hosts that must reach the internet DIRECTLY while Brave runs through Hiddify.
+# Read by ~/.local/bin/brave-hiddify and handed to Brave as --proxy-bypass-list.
+# One rule per line. Blank lines and #-comments are ignored.
+#
+# Chromium matches a rule against the host in the URL, so "example.com" covers
+# the apex domain and "*.example.com" covers only its subdomains - list BOTH
+# when you want the apex domain included (verified on Brave snap 690).
+#
+# Verified-working syntax: <local>, example.com, example.com:80,
+# *.example.com, 192.168.*, 192.168.0.0/16, and comma-separated lists.
+
+# This machine, localhost, *.local. Chromium already bypasses these by default.
+<local>
+
+# Local network - a remote proxy can never reach the router, NAS or a printer.
+192.168.*
+10.*
+172.16.*
+
+# Russian sites that reject or throttle foreign IPs (banks, some services).
+# Uncomment per domain, apex + wildcard as above.
+#example.ru
+#*.example.ru

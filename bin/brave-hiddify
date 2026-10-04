@@ -53,4 +53,18 @@ if ! ss -ltn 2>/dev/null | grep -q "$host:$port "; then
     echo "  Check 'Hiddify' in the corner menu if the browser cannot reach anything." >&2
 fi
 
-exec "$brave" --proxy-server="$proxy" "$@"
+# Optional per-domain bypass list: those hosts get a direct connection while
+# everything else stays proxied. Chromium matches these against the URL host, so
+# "example.com" covers example.com and "*.example.com" covers only subdomains -
+# list both when you want the apex domain too.
+proxy_args=(--proxy-server="$proxy")
+bypass_file="$HOME/.config/herbstluftwm/brave-bypass.list"
+if [ -f "$bypass_file" ]; then
+    bypass=$(sed -e 's/#.*//' -e 's/[[:space:]]//g' "$bypass_file" | grep -v '^$' | paste -sd, -)
+    if [ -n "$bypass" ]; then
+        proxy_args+=(--proxy-bypass-list="$bypass")
+        echo "brave-hiddify: bypassing the proxy for: $bypass" >&2
+    fi
+fi
+
+exec "$brave" "${proxy_args[@]}" "$@"
