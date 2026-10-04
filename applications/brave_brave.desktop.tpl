@@ -219,5 +219,5 @@ Name[vi]=Cửa sổ ẩn danh mới
 Name[zh_CN]=新建隐身窗口
 Name[zh_TW]=新增無痕式視窗
 X-SnapAppName=brave
-Exec=/snap/bin/brave --incognito
+Exec=__HIDDIFY_WRAPPER__ --incognito
 

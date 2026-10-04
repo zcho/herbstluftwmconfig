@@ -1,7 +1,56 @@
 #!/bin/bash
+# Brave launcher: always route through the Hiddify mixed inbound (127.0.0.1:12334).
+#
+# Two silent failure modes are designed out here, both of which cost real
+# debugging time:
+#
+#   1. Chromium is single-instance. If Brave is already running, a new
+#      --proxy-server is DISCARDED and the running process just opens the URL —
+#      so the browser keeps going direct while the launcher looks successful.
+#      Chromium on Linux has no remote flag injection, so the only fix is a
+#      full restart; we warn loudly instead of pretending it worked.
+#   2. The old wrapper fell back to a plain launch whenever the port was not
+#      listening yet. After a reboot that happens routinely (Hiddify needs tens
+#      of seconds), and a proxy-less Brave looks exactly like a working one —
+#      YouTube simply "does not work". So we wait for the port, and we pass
+#      --proxy-server unconditionally: fail closed, never silently direct.
+
 port=12334
-if ss -ltn 2>/dev/null | grep -q "127.0.0.1:$port "; then
-    exec /snap/bin/brave --proxy-server="http://127.0.0.1:$port" "$@"
-else
-    exec /snap/bin/brave "$@"
+host=127.0.0.1
+proxy="http://$host:$port"
+brave=/snap/bin/brave
+wait_s=30
+
+if [ ! -x "$brave" ]; then
+    echo "brave-hiddify: $brave is not executable" >&2
+    exit 1
 fi
+
+# Single-instance check: the flag is only honoured by the first process.
+if pgrep -u "$(id -u)" -f 'brave\.com/brave' >/dev/null 2>&1; then
+    echo "brave-hiddify: WARNING — Brave is already running." >&2
+    echo "  Chromium will hand the URL to the live process and drop" >&2
+    echo "  --proxy-server, so the browser stays on a direct connection." >&2
+    echo "  Quit Brave completely (all windows) and launch again." >&2
+fi
+
+waited=0
+while [ "$waited" -lt "$wait_s" ]; do
+    if ss -ltn 2>/dev/null | grep -q "$host:$port "; then
+        break
+    fi
+    if [ "$waited" -eq 0 ]; then
+        echo "brave-hiddify: waiting up to ${wait_s}s for the Hiddify proxy on $proxy ..." >&2
+    fi
+    sleep 1
+    waited=$((waited + 1))
+done
+
+if ! ss -ltn 2>/dev/null | grep -q "$host:$port "; then
+    echo "brave-hiddify: proxy still not listening after ${wait_s}s." >&2
+    echo "  Launching Brave WITH the proxy anyway: sites will fail to load" >&2
+    echo "  until Hiddify is up, but nothing will leak to a direct connection." >&2
+    echo "  Check 'Hiddify' in the corner menu if the browser cannot reach anything." >&2
+fi
+
+exec "$brave" --proxy-server="$proxy" "$@"

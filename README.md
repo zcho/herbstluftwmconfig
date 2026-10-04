@@ -16,7 +16,7 @@ mylinux/
 ├── alacritty/
 │   └── alacritty.yml          # terminal config (copy/paste bindings, theme)
 ├── bin/
-│   ├── brave-hiddify          # Brave launcher: auto proxy if Hiddify is up
+│   ├── brave-hiddify          # Brave launcher: always via the Hiddify proxy, waits for the port
 │   └── telegram-hiddify       # Telegram launcher: via proxychains → Hiddify
 ├── applications/
 │   └── brave_brave.desktop.tpl# Brave menu entry (template, $HOME-inserted on install)
@@ -115,13 +115,19 @@ Its configs live in `~/.local/share/hiddify/` and are not part of this repo.
 In **proxy mode** Hiddify listens on `127.0.0.1:12334` (mixed HTTP/SOCKS). Brave
 does not pick it up automatically, so this repo ships:
 
-- `bin/brave-hiddify` — launcher that checks whether the port `12334` is up and
-  starts Brave with `--proxy-server="http://127.0.0.1:12334"` only when Hiddify is
-  running; otherwise it launches plain Brave (restart Brave after toggling Hiddify).
-- `applications/brave_brave.desktop.tpl` — snap Brave menu entry redirected to the
-  wrapper (generated into `~/.local/share/applications` by `install.sh`).
-- `herbstluftwm/apps.txt` — launcher entries for the corner menu: **Brave**
-  (auto), **Brave Proxy** (forced proxy) and **Telegram**.
+  - `bin/brave-hiddify` — launcher that waits up to 30 s for the port `12334` and then
+    **always** starts Brave with `--proxy-server="http://127.0.0.1:12334"`. It never falls back
+    to a plain launch: after a reboot Hiddify is not up yet, and a proxy-less Brave is
+    indistinguishable from a working one until you notice YouTube won't open. If the proxy
+    still isn't up after the wait, it says so and launches with the proxy anyway (sites fail
+    instead of leaking). It also warns if Brave is already running, because Chromium is
+    single-instance: a new `--proxy-server` is dropped by the live process, so Brave has to be
+    quit completely before the proxy can be applied.
+  - `applications/brave_brave.desktop.tpl` — snap Brave menu entry redirected to the
+    wrapper (generated into `~/.local/share/applications` by `install.sh`). Every action,
+    including *New Incognito Window*, goes through the wrapper.
+  - `herbstluftwm/apps.txt` — launcher entries for the corner menu: **Brave** (via the
+    wrapper) and **Telegram**.
 
 Telegram Desktop does not pick up the proxy automatically either, and its domains
 are commonly blocked, so it is launched through `proxychains4`:
