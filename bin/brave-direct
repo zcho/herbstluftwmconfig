@@ -1,0 +1,28 @@
+#!/bin/bash
+# Brave launcher with NO proxy: a deliberately direct connection.
+#
+# Use brave-hiddify's bypass list (herbstluftwm/brave-bypass.list) when a couple of
+# domains need to go direct and you want to keep a single browser. Use this when
+# the whole browser has to be direct, or when you want to compare a proxied and a
+# direct session side by side.
+#
+# Chromium is single-instance per --user-data-dir, so reusing the main profile
+# would do nothing: the URL would be handed to the already-running (proxied)
+# Brave. A separate profile directory is therefore required, not cosmetic — it
+# is what makes this an independent process that can run next to the proxied one.
+#
+# The trade-off: this profile starts empty, so logins, cookies, extensions and
+# history do NOT carry over from the proxied Brave. Nothing here goes through
+# Hiddify, which is the point - sites that block or throttle foreign IPs will
+# work, and the connection is visible to them as your real IP.
+brave=/snap/bin/brave
+profile="$HOME/snap/brave/common/brave-direct"
+
+if [ ! -x "$brave" ]; then
+    echo "brave-direct: $brave is not executable" >&2
+    exit 1
+fi
+
+mkdir -p "$profile" 2>/dev/null || true
+
+exec "$brave" --user-data-dir="$profile" --no-first-run "$@"

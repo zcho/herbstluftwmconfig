@@ -135,9 +135,11 @@ does not pick it up automatically, so this repo ships:
 
   The proxy is a property of the whole process, not of a tab, so the bypass list is
   per-*domain*: a tab opened on a bypassed domain connects directly while YouTube stays
-  proxied. Two tabs on the *same* domain cannot differ — that needs either a second Brave
-  instance (`--user-data-dir`, verified to coexist) or a `chrome.proxy` extension such as
-  FoxyProxy/SwitchyOmega.
+  proxied. Two tabs on the *same* domain cannot differ. For that there is
+  - `bin/brave-direct` — a second Brave with **no** proxy at all, in its own profile
+    (`~/snap/brave/common/brave-direct`). Verified to run next to the proxied instance.
+    The profile starts empty, so logins do not carry over; the connection is visible to
+    sites as your real IP. Reachable from the corner menu as **Brave Direct**.
 
 Telegram Desktop does not pick up the proxy automatically either, and its domains
 are commonly blocked, so it is launched through `proxychains4`:

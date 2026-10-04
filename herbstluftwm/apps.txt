@@ -5,6 +5,7 @@ Chromium	chromium
 Firefox	firefox
 Telegram	~/.local/bin/telegram-hiddify
 Brave	~/.local/bin/brave-hiddify
+Brave Direct	~/.local/bin/brave-direct
 Alacritty	alacritty
 Files	nautilus
 Hiddify	~/.local/bin/hiddify-gui
