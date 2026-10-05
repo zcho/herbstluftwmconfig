@@ -19,6 +19,23 @@ _xdg_add /var/lib/snapd/desktop
 export XDG_DATA_DIRS
 unset -f _xdg_add
 
+# Hiddify proxy, exported for everything hlwm spawns (panel, corner menu, autostart
+# apps, `bind-m spawn`). Plain assignments, so re-running on reload is idempotent.
+# Why: Zed's own endpoints are unreachable at a usable speed from this network —
+# api.zed.dev and cdn.zed.dev live in 8.47.69.0/24 and a direct TCP handshake
+# takes 5-10 s, then stalls (cwnd=1, rto backoff 120 s), so the bundled `html`
+# extension never installs and the status bar shows "Installing html extension..."
+# forever; through the proxy the same request takes 0.26 s. NO_PROXY keeps
+# loopback and LAN direct (ja-netfilter, Ollama on 127.0.0.1:11434).
+export HTTP_PROXY=http://127.0.0.1:12334
+export HTTPS_PROXY=http://127.0.0.1:12334
+export http_proxy=http://127.0.0.1:12334
+export https_proxy=http://127.0.0.1:12334
+export ALL_PROXY=http://127.0.0.1:12334
+export all_proxy=http://127.0.0.1:12334
+export NO_PROXY=localhost,127.0.0.1,::1,192.168.0.0/16,10.0.0.0/8,172.16.0.0/12,.local
+export no_proxy=$NO_PROXY
+
 # this is a simple config for herbstluftwm
 
 hc() {
